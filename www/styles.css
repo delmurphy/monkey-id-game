@@ -1,0 +1,9 @@
+body {
+  background-image: url("background_b.png");
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.background2 {
+  background-image: url("background_m.png");
+}

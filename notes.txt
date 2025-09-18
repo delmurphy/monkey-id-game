@@ -1,0 +1,19 @@
+Global
+
+Load dataset of ids, image filepaths
+Load list of possible ids (perhaps 2 columns: id and available)
+
+PokeQuestion function
+take df of ids and images (e.g. pokeguess) as well as recent images/possible ids
+choose an image that has not appeared in the last 10? questions
+choose the reference images
+return image filepath, correctID, decoyID
+
+PokeAnswer function
+take image filepath, computer correct and player correct
+update and return possible ids
+
+Server
+after PokeAnswer function
+if player correct, pokereact$Playscore <- pokereact$Playscore +1
+if computer correct, pokereact$Compscore <- pokereact$Compscore +1

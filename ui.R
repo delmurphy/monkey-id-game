@@ -3,65 +3,72 @@ library(shiny.semantic)
 library(data.table)
 library(recoder)
 library(DT)
+library(shinyalert)
+library(shinyjs)
+library(bslib)
 
-#### Function ####
-inline_dropdown <- function(name, choices, choices_value = choices, default_text = "Select", value = NULL) {
-  unique_dropdown_class <- paste0("dropdown_name_", name)
-  class <- paste("ui inline basic dropdown", unique_dropdown_class)
-  shiny::tagList(
-    shiny::span(
-      class = class,
-      shiny_text_input(name, shiny::tags$input(type = "hidden", name = name), value = value),
-      shiny::div(class = "default text", default_text),
-      uimenu(purrr::map2(choices, choices_value, ~menu_item(`data-value` = .y, .x))),
-      uiicon("dropdown")
-    ),
-    shiny::tags$script(paste0("$('.ui.dropdown.", unique_dropdown_class, "').dropdown().dropdown('set selected', '", value, "');"))
-  )
-}
+
 
 #### UI ####
 semanticPage(
-  title = "Pokémon 20 Questions",
-  tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
+  title = "Identify the baboon",
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
+    tags$script(src = "script.js"),
+    #tags$script(src = "jquery-3.7.1.min.js"),  # Include jQuery library from CDN
+    #tags$script(src = "semantic.min.js"),
+  ),
   suppressDependencies("bootstrap"),
 
   #### Header ####
-  div(img(src = "logo.png", width = "50%", height = "15%"),
-    style = "text-align: center;",
+  div(img(src = "DPZ.jpg", width = "12%", height = "18%"),
+    style = "text-align: left;",
 
-    #### Info ####
+   #### Info ####
     span(
       tags$button(
-        class = "right floated circular ui info icon button", style = "margin: 50px;",
-        tags$i(class = "info icon")
+        class = "right floated circular ui massive info icon button", style = "margin: 10px;",
+        tags$i(class = "info icon",
+               title = "Info")
       ),
       div(
         class = "ui info modal",
         div(class = "header", "Info"),
         div(
           class = "content",
-          h5(
-            "Welcome to the Pokémon 20 Question app. This works in the same way as a standard 20 Question but in the",
-            "world of Pokémon. You can select any one of the 721 monsters from Generations 1-6 and go through each",
-            "question, answering yes/no/don't know until there is either one Pokémon left\n and will show you the one it has guessed,",
-            "or if it can't guess in time then you have won."
+          fluidRow(
+            img(src = "DPZ.jpg", height = "20%", width = "40%", style = "margin-right: 30px"),
+            img(src = "logo.png", height = "20%", width = "40%", style = "margin-left: 100px"),
           ),
-          h5(
-            "If you are finding that it is guessing it correctly too much for your liking, then to",
-            "make it easier for\n you, you can reduce the amount of questions the app can ask."
-          ),
-          h6(
-            "Source code is available on",
-            a("GitHub.", href = "https://github.com/ashbaldry/Pokemon_20Q", target = "_blank"),
-            "All data and images have been retreived from",
-            a("veekun.com", href = "https://veekun.com", target = "_blank")
-          )
+          uiOutput("info1"),
+          #"Test info",
+          br(),
+          uiOutput("info2")
+          #"Test info2"
         )
       ),
-      tags$script("$('.info.modal').modal('attach events', '.info.button', 'show');")
+      tags$script("$('.info.modal').modal('attach events', '.info.button', 'show');"),
+      tags$button(
+        id = "restart",
+        class = "right floated circular ui massive info icon button", style = "margin: 10px;",
+        tags$i(class = "refresh icon",
+               title = "Neustart/Restart")
+      ),
+      tags$button(
+        id = "language",
+        class = "right floated circular ui massive info icon button", style = "margin: 10px;",
+        tags$i(class = "globe icon",
+               title = "Sprache/Language")
+      ),
+      tags$button(
+        id = "species",
+        class = "right floated circular ui massive info icon button", style = "margin: 10px;",
+        tags$i(class = "paw icon",
+               title = "Spezies/Species")
+      )
     )
   ),
+
 
   #### Main ####
   div(
@@ -74,10 +81,12 @@ semanticPage(
       div(
         class = "two wide column",
         div(
-          class = "ui inverted circular segment", style = "padding: 50px 60px;",
-          h2(class = "ui header", style = "text-align: center;", "Player"),
-          h1(class = "sub header", style = "text-align: center;", textOutput("playscore"))
-        )
+          class = "ui inverted circular segment", #style = "padding: 50px 60px;",
+          style = "min-width: 250px; min-height: 260px;",
+          h2(class = "ui header", style = "text-align: center;", textOutput("playertext")),
+          h1(class = "sub header", style = "text-align: center;", textOutput("playscore")),
+        ),
+        uiOutput("qnumber")
       ),
       div(class = "one wide column"),
 
@@ -86,21 +95,10 @@ semanticPage(
         class = "eight wide column",
         div(
           class = "ui clearing segment",
-          h4(
-            style = "text-align: right;",
-            strong(textOutput("questinfo", inline = TRUE)), "/",
-            inline_dropdown("nguesses", choices = seq(5, 20, 5), value = 20)
-          ),
-          uiOutput("pokeguess"),
-          tags$br(),
-          tags$button(class = "ui right floated reference button", "Reference Table"),
-          div(
-            class = "ui reference modal",
-            div(class = "header", "Pokémon Reference"),
-            div(class = "content", DT::dataTableOutput("IndexTable"))
-          ),
-          tags$script("$('.reference.modal').modal('attach events', '.reference.button', 'show');"),
-          tags$script("$('.reference.button').on('click', function() {$('#IndexTable').show().trigger('shown');});")
+           uiOutput("din_css"),
+           uiOutput("pokeguess")
+
+          #tags$script("$('.reference.modal').modal('attach events', '.reference.button', 'show');"),
         )
       ),
 
@@ -109,10 +107,25 @@ semanticPage(
       div(
         class = "two wide column",
         div(
-          class = "ui circular segment", style = "padding: 50px 40px;",
+          class = "ui circular segment", #style = "padding: 50px 40px;",
+          style = "min-width: 250px; min-height: 260px;",
           h2(class = "ui header", style = "text-align: center;", "Computer"),
           h1(class = "sub header", style = "text-align: center;", textOutput("compscore"))
-        )
+        ),
+        fluidRow(
+          tags$style(HTML(
+          ".shiny-notification {
+              background-color:#112446;
+              color:#FFFFFF;
+              height: 100px;
+              width: 400px;
+              position:fixed;
+              top: calc(100% - 600px);;
+              left: calc(100% - 500px);;
+              font-size: 20px}"
+              )),
+          uiOutput("spinner")
+        ),
       ),
       div(class = "one wide column")
     )
