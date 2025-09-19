@@ -7,3 +7,5 @@ A game I developed for the Cogntivite Ethology Lab at the German Primate Center 
 The game illustrates the challenge of identifying individual monkeys for field researchers and for machine learning models. The player plays against a (simulated) machine learning classifier to correctly match as many monkey faces as they can over 12 rounds. 
 The player can choose the language (German or English) and the species (baboon or macaque) they want to play with.
 Players are rewarded with a little piece of trivia about the monkeys, if they get it right, or about a machine learning classifier that is currently being trained, if they get it wrong.
+
+See the game in action here: https://01996224-aa23-1529-3080-55154f4b3f76.share.connect.posit.cloud/
